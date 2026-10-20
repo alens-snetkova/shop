@@ -1,0 +1,134 @@
+/* Подключение шрифта Jost */
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@100..900&display=swap");
+
+/* Базовые настройки: 1rem = 10px для удобных расчётов */
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
+}
+
+:root {
+  /* Основные цвета */
+  --color-white: #fafafa;
+  --color-black: #222;
+
+  /* Акцентные цвета 
+  --color-primary: #c9a96e;    
+  --color-secondary: #333;*/
+
+  /* Текст */
+  --text-main: #222;
+  --text-light: #fff;
+  --text-muted: #595959;
+}
+
+/* Глобальный сброс: убираем стандартные отступы и включаем box-sizing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Основные стили страницы */
+body {
+  background: var(--color-white);
+  color: var(--text-main);
+  font-family: "Jost", sans-serif;
+  font-weight: 300;
+  font-size: 1.6rem; /* 16px */
+}
+
+/* Контейнер для центрирования контента */
+.wrapper {
+  width: 100%;
+  max-width: 128rem; /* 1280px: ограничиваем ширину для корректного отображения на маленьких экранах */
+  margin: 5rem auto; /* 50px верх/низ, auto по бокам для центрирования */
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Верхняя полоса: лого слева, меню справа */
+.top-bar {
+  display: flex;
+  justify-content: space-between; /* разносит элементы по краям */
+  align-items: center; /* выравнивает по вертикали */
+  padding: 2rem 0; /* 20px сверху/снизу, 40px по бокам */
+  background: var(--bg-dark);
+}
+
+.logo {
+  font-weight: 600;
+  font-size: 2rem; /* 20px */
+  letter-spacing: 0.1rem; /* 1px */
+  color: var(--text-main);
+}
+
+.nav {
+  display: flex; /* включаем flexbox */
+  gap: 2rem; /* 20px между пунктами */
+  list-style: none; /* убираем точки списка */
+  margin: 0;
+  padding: 0;
+}
+
+.nav li a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 1.6rem; /* 16px */
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.nav li a:hover {
+  color: var(--text-main); /* цвет при наведении */
+  text-decoration: underline; /* подчеркивание при наведении */
+  text-decoration-thickness: 0.1rem; /* толщина линии */
+  text-underline-offset: 0.4rem; /* отступ линии от текста */
+}
+
+.presentation {
+  margin: 5rem 0;
+  background: url("./img/bg1.jpg") no-repeat center center;
+  width: 100%;
+  height: 70rem; /* 700px */
+  background-size: cover;
+  background-blend-mode: multiply;
+  background-color: var(--color-white);
+  position: relative;
+}
+
+/* Первая строка — крупнее и жирнее */
+.presentation::before {
+  content: "Cozy stuff";
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4rem; /* 40px */
+  font-weight: 600;
+  letter-spacing: 0.2rem; /* 2px */
+  color: var(--text-light);
+}
+
+/* Вторая строка — меньше и легче */
+.presentation::after {
+  content: "better for your home";
+  position: absolute;
+  bottom: 2rem; /* располагаем ниже первой строки */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.4rem; /* 24px — меньше, чем первая */
+  font-weight: 300; /* тоньше */
+  letter-spacing: 0.1rem; /* 1px */
+  color: var(--text-light);
+}
+
+footer {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 10rem 0; /* 200px сверху и снизу */
+  font-size: 1.4rem; /* 14px */
+}
