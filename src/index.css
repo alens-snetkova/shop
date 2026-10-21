@@ -11,10 +11,10 @@ html {
   /* Основные цвета */
   --color-white: #fafafa;
   --color-black: #222;
-
-  /* Акцентные цвета 
-  --color-primary: #c9a96e;    
-  --color-secondary: #333;*/
+  --color-gray: #ededed;
+  --color-button: #727272;
+  --color-button-hover: #303030;
+  --color-active: #027b4b;
 
   /* Текст */
   --text-main: #222;
@@ -41,8 +41,8 @@ body {
 /* Контейнер для центрирования контента */
 .wrapper {
   width: 100%;
-  max-width: 128rem; /* 1280px: ограничиваем ширину для корректного отображения на маленьких экранах */
-  margin: 5rem auto; /* 50px верх/низ, auto по бокам для центрирования */
+  max-width: 128rem; /* 1280px */
+  margin: 3rem auto;
 }
 
 header {
@@ -50,26 +50,47 @@ header {
   flex-direction: column;
 }
 
-/* Верхняя полоса: лого слева, меню справа */
+/* Верхняя полоса: лого, меню, корзина */
 .top-bar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-white);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+/* Внутренний слой — контент по центру */
+.top-bar .container {
+  max-width: 128rem;
+  margin: 0 auto;
+  padding: 2rem 0;
   display: flex;
-  justify-content: space-between; /* разносит элементы по краям */
-  align-items: center; /* выравнивает по вертикали */
-  padding: 2rem 0; /* 20px сверху/снизу, 40px по бокам */
-  background: var(--bg-dark);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2rem;
+  align-items: center;
+  position: relative; /* корзина позиционируется относительно этого блока */
 }
 
 .logo {
   font-weight: 600;
-  font-size: 2rem; /* 20px */
-  letter-spacing: 0.1rem; /* 1px */
+  font-size: 2rem;
+  letter-spacing: 0.1rem;
   color: var(--text-main);
 }
 
 .nav {
-  display: flex; /* включаем flexbox */
-  gap: 2rem; /* 20px между пунктами */
-  list-style: none; /* убираем точки списка */
+  display: flex;
+  gap: 2rem;
+  list-style: none;
   margin: 0;
   padding: 0;
 }
@@ -77,27 +98,110 @@ header {
 .nav li a {
   text-decoration: none;
   color: var(--text-muted);
-  font-size: 1.6rem; /* 16px */
+  font-size: 1.6rem;
   font-weight: 400;
   transition: color 0.3s ease;
 }
 
 .nav li a:hover {
-  color: var(--text-main); /* цвет при наведении */
-  text-decoration: underline; /* подчеркивание при наведении */
-  text-decoration-thickness: 0.1rem; /* толщина линии */
-  text-underline-offset: 0.4rem; /* отступ линии от текста */
+  color: var(--text-main);
+  text-decoration: underline;
+  text-decoration-thickness: 0.1rem;
+  text-underline-offset: 0.4rem;
+}
+
+.cart-icon {
+  margin: 1rem 0 1rem 1rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: inline-block;
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.cart-icon:hover {
+  transform: scale(1.2);
+  color: var(--text-main);
+}
+
+.cart-icon.active {
+  color: var(--color-active);
+}
+
+.cart {
+  position: absolute; /* относительно .nav-wrapper (корзина должна лежать внутри него в JSX) */
+  top: 100%;
+  right: 0;
+  margin-top: 1rem;
+  width: 45rem;
+  max-width: calc(
+    100vw - 6rem
+  ); /* ДОБАВЛЕНО: не вылезает за экран на узких устройствах */
+  height: auto;
+  min-height: 20rem;
+  max-height: 50rem; /* длинный список будет прокручиваться */
+  padding: 1.5rem;
+  background: var(--color-gray);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 1000; /* выше, чем у .top-bar (100) */
+  overflow: auto; /* ← добавь это, чтобы содержимое не обрезалось */
+  color: var(--text-main);
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cart-item img {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: 0.8rem;
+}
+
+.cart-item-title {
+  flex-grow: 1;
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+
+.cart-item b {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.cart-total {
+  margin-top: 1.5rem;
+  text-align: right;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.cart-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 5rem 0;
 }
 
 .presentation {
-  margin: 5rem 0;
-  background: url("./img/bg1.jpg") no-repeat center center;
+  margin-top: 8rem; /* отступ под фиксированную шапку */
+  background: url("/img/bg.jpg") no-repeat center center;
   width: 100%;
-  height: 70rem; /* 700px */
+  height: 70rem;
   background-size: cover;
   background-blend-mode: multiply;
   background-color: var(--color-white);
   position: relative;
+  border-radius: 2rem;
+  overflow: hidden;
 }
 
 /* Первая строка — крупнее и жирнее */
@@ -107,9 +211,9 @@ header {
   bottom: 5rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 4rem; /* 40px */
+  font-size: 4rem;
   font-weight: 600;
-  letter-spacing: 0.2rem; /* 2px */
+  letter-spacing: 0.2rem;
   color: var(--text-light);
 }
 
@@ -117,18 +221,111 @@ header {
 .presentation::after {
   content: "better for your home";
   position: absolute;
-  bottom: 2rem; /* располагаем ниже первой строки */
+  bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2.4rem; /* 24px — меньше, чем первая */
-  font-weight: 300; /* тоньше */
-  letter-spacing: 0.1rem; /* 1px */
+  font-size: 2.4rem;
+  font-weight: 300;
+  letter-spacing: 0.1rem;
   color: var(--text-light);
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: 600;
+  letter-spacing: 0.1rem;
+  color: var(--text-main);
+  margin-top: 8rem;
+  margin-bottom: 2rem;
+}
+
+main {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+main .item {
+  width: 30%;
+  padding: 1.5rem;
+  background: var(--color-gray);
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Картинка с фиксированной высотой */
+main .item img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  margin-bottom: 1.5rem;
+  border-radius: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+main .item img:hover {
+  transform: scale(1.05);
+}
+
+/* Заголовок товара */
+main .item h2 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  color: var(--text-main); /* ИСПРАВЛЕНО: было --color-text */
+}
+
+/* Описание */
+main .item p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text-muted); /* ИСПРАВЛЕНО: было --color-text-muted */
+  margin-bottom: 1.5rem;
+  flex-grow: 1; /* прижимает цену к низу */
+}
+
+/* Цена */
+main .item b {
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--text-main); /* ИСПРАВЛЕНО: было --color-main */
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+/* Кнопка */
+main .item .add-to-cart {
+  padding: 1rem;
+  background: var(--color-button);
+  color: var(--text-light);
+  text-align: center;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: auto; /* прижимает кнопку к низу карточки */
+}
+
+main .item .add-to-cart:hover {
+  background: var(--color-button-hover);
 }
 
 footer {
   text-align: center;
   color: var(--text-muted);
-  padding: 10rem 0; /* 200px сверху и снизу */
-  font-size: 1.4rem; /* 14px */
+  padding: 10rem 0;
+  font-size: 1.4rem;
+}
+
+.container {
+  max-width: 128rem;
+  margin: 0 auto;
+  padding: 0 3rem;
+  width: 100%;
+  box-sizing: border-box;
 }
