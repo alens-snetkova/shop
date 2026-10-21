@@ -1,81 +1,60 @@
-import React from "react";
+import { useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Categories from "./components/Categories";
 import Items from "./components/Items";
+import { ITEMS } from "./data/items";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      orders: [],
-      items: [
-        {
-          id: 1,
-          title: "Chair grey",
-          img: "/img/chair-grey.jpg",
-          desc: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-          category: "chairs",
-          price: "49.99",
-        },
-        {
-          id: 2,
-          title: "Table oak",
-          img: "/img/table-oak.jpg",
-          desc: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-          category: "tables",
-          price: "199.99",
-        },
-        {
-          id: 3,
-          title: "Sofa blue",
-          img: "/img/sofa-blue.jpg",
-          desc: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-          category: "sofas",
-          price: "499.99",
-        },
-        {
-          id: 4,
-          title: "Lamp desk",
-          img: "/img/lamp-desk.jpg",
-          desc: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-          category: "lamps",
-          price: "29.99",
-        },
-        {
-          id: 5,
-          title: "Shelf wall",
-          img: "/img/shelf-wall.jpg",
-          desc: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-          category: "shelves",
-          price: "39.99",
-        },
-        {
-          id: 6,
-          title: "Armchair leather",
-          img: "/img/armchair-leather.jpg",
-          desc: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-          category: "chairs",
-          price: "299.99",
-        },
-      ],
-    };
-  }
+export default function App() {
+  const [orders, setOrders] = useState([]);
+  const [category, setCategory] = useState("all");
 
-  addToOrder = (item) => {
-    /*console.log("Adding to order:", item.title);*/
-    this.setState({ orders: [...this.state.orders, item] });
+  const addToOrder = (item) =>
+    setOrders((prev) =>
+      prev.some((o) => o.id === item.id)
+        ? prev.map((o) =>
+            o.id === item.id ? { ...o, quantity: o.quantity + 1 } : o,
+          )
+        : [...prev, { ...item, quantity: 1 }],
+    );
+
+  // delta = +1 / -1; товар удаляется, когда количество достигает 0
+  const updateQuantity = (id, delta) =>
+    setOrders((prev) =>
+      prev
+        .map((o) => (o.id === id ? { ...o, quantity: o.quantity + delta } : o))
+        .filter((o) => o.quantity > 0),
+    );
+
+  const removeFromOrder = (id) =>
+    setOrders((prev) => prev.filter((o) => o.id !== id));
+
+  const chooseCategory = (key) => {
+    console.log("category:", key);
+    setCategory(key);
   };
 
-  render() {
-    return (
-      <div className="wrapper">
-        <Header orders={this.state.orders} />
-        <h2 className="section-title">Catalog</h2>
-        <Items items={this.state.items} onAdd={this.addToOrder} />
-        <Footer />
-      </div>
-    );
-  }
-}
+  const visibleItems =
+    category === "all"
+      ? ITEMS
+      : ITEMS.filter((item) => item.category === category);
 
-export default App;
+  return (
+    <div className="wrapper">
+      <Header
+        orders={orders}
+        updateQuantity={updateQuantity}
+        removeFromOrder={removeFromOrder}
+      />
+      <h2 className="section-title">Catalog</h2>
+      <Categories activeCategory={category} onChoose={chooseCategory} />
+      <Items
+        items={visibleItems}
+        orders={orders}
+        onAdd={addToOrder}
+        updateQuantity={updateQuantity}
+      />
+      <Footer />
+    </div>
+  );
+}

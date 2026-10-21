@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoCartOutline } from "react-icons/io5";
+import QuantityControl from "./QuantityControl";
+import { MdDeleteForever } from "react-icons/md";
 
-export default function Header({ orders = [] }) {
+const NAV_LINKS = ["Home", "Catalog", "About Us", "Contacts"];
+
+export default function Header({
+  orders = [],
+  updateQuantity,
+  removeFromOrder,
+}) {
   const [cartOpen, setCartOpen] = useState(false);
 
   const total = orders
-    .reduce((sum, item) => sum + Number(item.price), 0)
+    .reduce((sum, o) => sum + o.price * o.quantity, 0)
     .toFixed(2);
 
   return (
@@ -15,22 +23,15 @@ export default function Header({ orders = [] }) {
           <span className="logo">Home Decor</span>
           <div className="nav-wrapper">
             <ul className="nav">
-              <li>
-                <a href="#">Home</a>
-              </li>
-              <li>
-                <a href="#">Catalog</a>
-              </li>
-              <li>
-                <a href="#">About Us</a>
-              </li>
-              <li>
-                <a href="#">Contacts</a>
-              </li>
+              {NAV_LINKS.map((link) => (
+                <li key={link}>
+                  <a href="#">{link}</a>
+                </li>
+              ))}
             </ul>
 
             <IoCartOutline
-              onClick={() => setCartOpen(!cartOpen)}
+              onClick={() => setCartOpen((open) => !open)}
               className={`cart-icon ${cartOpen ? "active" : ""}`}
             />
 
@@ -38,11 +39,23 @@ export default function Header({ orders = [] }) {
               <div className="cart">
                 {orders.length > 0 ? (
                   <>
-                    {orders.map((el, index) => (
-                      <div className="cart-item" key={`${el.id}-${index}`}>
+                    {orders.map((el) => (
+                      <div className="cart-item" key={el.id}>
                         <img src={el.img} alt={el.title} />
                         <span className="cart-item-title">{el.title}</span>
-                        <b>{el.price} $</b>
+                        <QuantityControl
+                          quantity={el.quantity}
+                          onChange={(delta) => updateQuantity(el.id, delta)}
+                          quantityClassName="item-price"
+                        />
+                        <b className="item-total">
+                          {(el.price * el.quantity).toFixed(2)} $
+                        </b>
+                        <MdDeleteForever
+                          className="cart-icon-delete"
+                          title="Remove"
+                          onClick={() => removeFromOrder(el.id)}
+                        />
                       </div>
                     ))}
                     <p className="cart-total">Total: {total} $</p>

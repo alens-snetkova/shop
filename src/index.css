@@ -1,7 +1,8 @@
-/* Подключение шрифта Jost */
 @import url("https://fonts.googleapis.com/css2?family=Jost:wght@100..900&display=swap");
 
-/* Базовые настройки: 1rem = 10px для удобных расчётов */
+/* Шрифты и база*/
+
+/* 1rem = 10px для удобных расчётов */
 html {
   font-size: 62.5%;
   scroll-behavior: smooth;
@@ -15,6 +16,7 @@ html {
   --color-button: #727272;
   --color-button-hover: #303030;
   --color-active: #027b4b;
+  --color-disabled: #be0000;
 
   /* Текст */
   --text-main: #222;
@@ -22,14 +24,13 @@ html {
   --text-muted: #595959;
 }
 
-/* Глобальный сброс: убираем стандартные отступы и включаем box-sizing */
+/* Глобальный сброс */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Основные стили страницы */
 body {
   background: var(--color-white);
   color: var(--text-main);
@@ -38,19 +39,26 @@ body {
   font-size: 1.6rem; /* 16px */
 }
 
-/* Контейнер для центрирования контента */
+/* Контейнеры */
 .wrapper {
   width: 100%;
   max-width: 128rem; /* 1280px */
   margin: 3rem auto;
 }
 
+.container {
+  max-width: 128rem;
+  margin: 0 auto;
+  padding: 0 3rem;
+  width: 100%;
+}
+
+/* Шапка: логотип, меню, иконка корзины */
 header {
   display: flex;
   flex-direction: column;
 }
 
-/* Верхняя полоса: лого, меню, корзина */
 .top-bar {
   width: 100%;
   position: fixed;
@@ -62,14 +70,18 @@ header {
   z-index: 100;
 }
 
-/* Внутренний слой — контент по центру */
 .top-bar .container {
-  max-width: 128rem;
-  margin: 0 auto;
   padding: 2rem 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.logo {
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: 0.1rem;
+  color: var(--text-main);
 }
 
 .nav-wrapper {
@@ -80,19 +92,10 @@ header {
   position: relative; /* корзина позиционируется относительно этого блока */
 }
 
-.logo {
-  font-weight: 600;
-  font-size: 2rem;
-  letter-spacing: 0.1rem;
-  color: var(--text-main);
-}
-
 .nav {
   display: flex;
   gap: 2rem;
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .nav li a {
@@ -115,11 +118,11 @@ header {
   width: 2.2rem;
   height: 2.2rem;
   display: inline-block;
+  cursor: pointer;
+  color: var(--text-muted);
   transition:
     transform 0.3s ease,
     color 0.3s ease;
-  cursor: pointer;
-  color: var(--text-muted);
 }
 
 .cart-icon:hover {
@@ -131,25 +134,23 @@ header {
   color: var(--color-active);
 }
 
+/* Корзина (в шапке) */
 .cart {
-  position: absolute; /* относительно .nav-wrapper (корзина должна лежать внутри него в JSX) */
+  position: absolute;
   top: 100%;
   right: 0;
   margin-top: 1rem;
   width: 45rem;
-  max-width: calc(
-    100vw - 6rem
-  ); /* ДОБАВЛЕНО: не вылезает за экран на узких устройствах */
-  height: auto;
-  min-height: 20rem;
-  max-height: 50rem; /* длинный список будет прокручиваться */
+  max-width: calc(100vw - 6rem); /* не вылезает за экран на узких устройствах */
+  min-height: 10rem;
+  max-height: 50rem; /* длинный список прокручивается */
   padding: 1.5rem;
   background: var(--color-gray);
+  color: var(--text-main);
   border-radius: 1rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: auto;
   z-index: 1000; /* выше, чем у .top-bar (100) */
-  overflow: auto; /* ← добавь это, чтобы содержимое не обрезалось */
-  color: var(--text-main);
 }
 
 .cart-item {
@@ -167,21 +168,51 @@ header {
   border-radius: 0.8rem;
 }
 
+/* Название и цена занимают поровну, поэтому блок количества стоит по центру */
 .cart-item-title {
-  flex-grow: 1;
+  flex: 1;
+  min-width: 0;
   font-size: 1.6rem;
   font-weight: 400;
 }
 
 .cart-item b {
+  flex: 1;
+  text-align: right;
   font-size: 1.6rem;
   font-weight: 600;
+}
+
+.cart .item-price {
+  min-width: 2rem;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.cart-icon-delete {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+.cart-icon-delete:hover {
+  color: var(--color-disabled);
+  transform: scale(1.2);
 }
 
 .cart-total {
   margin-top: 1.5rem;
   text-align: right;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 600;
 }
 
@@ -191,20 +222,43 @@ header {
   padding: 5rem 0;
 }
 
+/* Общий блок - и + (корзина и карточка каталога) */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cart-icon-quantity {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  display: inline-block;
+  cursor: pointer;
+  color: var(--text-main); /* по умолчанию — светлый фон корзины */
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+.cart-icon-quantity:hover {
+  transform: scale(1.2);
+}
+
+/* Главный баннер */
 .presentation {
   margin-top: 8rem; /* отступ под фиксированную шапку */
-  background: url("/img/bg.jpg") no-repeat center center;
   width: 100%;
   height: 70rem;
+  position: relative;
+  background: url("/img/bg.jpg") no-repeat center center;
   background-size: cover;
   background-blend-mode: multiply;
   background-color: var(--color-white);
-  position: relative;
   border-radius: 2rem;
   overflow: hidden;
 }
 
-/* Первая строка — крупнее и жирнее */
 .presentation::before {
   content: "Cozy stuff";
   position: absolute;
@@ -217,7 +271,6 @@ header {
   color: var(--text-light);
 }
 
-/* Вторая строка — меньше и легче */
 .presentation::after {
   content: "better for your home";
   position: absolute;
@@ -230,6 +283,7 @@ header {
   color: var(--text-light);
 }
 
+/* Каталог: заголовок, категории */
 .section-title {
   font-size: 3rem;
   font-weight: 600;
@@ -239,16 +293,42 @@ header {
   margin-bottom: 2rem;
 }
 
-main {
+.categories {
   display: flex;
-  width: 100%;
   flex-wrap: wrap;
-  gap: 2rem;
-  justify-content: space-between;
+  gap: 2rem 3rem;
+  margin: 2rem 2rem 2rem 0;
+}
+
+.categories div {
+  font-size: 2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.categories div:hover,
+.categories div.active {
+  color: var(--text-main);
+}
+
+/* Выбранная категория */
+.categories div.active {
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 0.1rem;
+  text-underline-offset: 0.4rem;
+}
+
+/* Каталог: сетка и карточка товара */
+main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  width: 100%;
 }
 
 main .item {
-  width: 30%;
   padding: 1.5rem;
   background: var(--color-gray);
   border-radius: 1rem;
@@ -257,7 +337,6 @@ main .item {
   flex-direction: column;
 }
 
-/* Картинка с фиксированной высотой */
 main .item img {
   width: 100%;
   height: 350px;
@@ -273,33 +352,30 @@ main .item img:hover {
   transform: scale(1.05);
 }
 
-/* Заголовок товара */
 main .item h2 {
   font-size: 1.75rem;
   font-weight: 500;
   margin: 0 0 1rem 0;
-  color: var(--text-main); /* ИСПРАВЛЕНО: было --color-text */
+  color: var(--text-main);
 }
 
-/* Описание */
 main .item p {
   font-size: 1.2rem;
   line-height: 1.6;
-  color: var(--text-muted); /* ИСПРАВЛЕНО: было --color-text-muted */
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
   flex-grow: 1; /* прижимает цену к низу */
 }
 
-/* Цена */
 main .item b {
   font-size: 3rem;
   font-weight: 600;
-  color: var(--text-main); /* ИСПРАВЛЕНО: было --color-main */
+  color: var(--text-main);
   margin-bottom: 1.5rem;
   display: block;
 }
 
-/* Кнопка */
+/* Кнопка «Add to Cart» */
 main .item .add-to-cart {
   padding: 1rem;
   background: var(--color-button);
@@ -315,17 +391,45 @@ main .item .add-to-cart:hover {
   background: var(--color-button-hover);
 }
 
+/* Блок «− число +» вместо кнопки, когда товар уже в корзине */
+main .item .in-cart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--color-button);
+  border-radius: 1rem;
+  margin-top: auto;
+  cursor: default;
+  transition: background 0.3s ease;
+}
+
+main .item .in-cart:hover {
+  background: var(--color-button-hover);
+}
+
+main .item .quantity-control {
+  gap: 3rem;
+}
+
+/* Тёмно-серый фон карточки: белые иконки и текст */
+main .item .in-cart .cart-icon-quantity {
+  color: var(--text-light);
+}
+
+main .item .quantity {
+  min-width: 2rem;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text-light);
+  user-select: none;
+}
+
+/* Подвал */
 footer {
   text-align: center;
   color: var(--text-muted);
   padding: 10rem 0;
   font-size: 1.4rem;
-}
-
-.container {
-  max-width: 128rem;
-  margin: 0 auto;
-  padding: 0 3rem;
-  width: 100%;
-  box-sizing: border-box;
 }

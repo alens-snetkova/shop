@@ -1,22 +1,25 @@
-import React, { Component } from "react";
+import QuantityControl from "./QuantityControl";
 
-export class Item extends Component {
-  render() {
-    return (
-      <div className="item">
-        <img src={this.props.item.img} alt={this.props.item.title} />
-        <h2>{this.props.item.title}</h2>
-        <p>{this.props.item.desc}</p>
-        <b>{this.props.item.price} $</b>
-        <div
-          className="add-to-cart"
-          onClick={() => this.props.onAdd(this.props.item)}
-        >
+export default function Item({ item, quantity, onAdd, updateQuantity }) {
+  return (
+    <div className="item">
+      <img src={item.img} alt={item.title} />
+      <h2>{item.title}</h2>
+      <p>{item.desc}</p>
+      <b>{item.price.toFixed(2)} $</b>
+      {quantity ? (
+        <div className="in-cart">
+          <QuantityControl
+            quantity={quantity}
+            onChange={(delta) => updateQuantity(item.id, delta)}
+            quantityClassName="quantity"
+          />
+        </div>
+      ) : (
+        <div className="add-to-cart" onClick={() => onAdd(item)}>
           Add to Cart
         </div>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
 }
-
-export default Item;
