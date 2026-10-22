@@ -22,6 +22,10 @@ html {
   --text-main: #222;
   --text-light: #fff;
   --text-muted: #595959;
+
+  --border-back: 1rem;
+  --border-img: 1.5rem;
+  --border-img-s: 0.8rem;
 }
 
 /* Глобальный сброс */
@@ -67,7 +71,7 @@ header {
   right: 0;
   background: var(--color-white);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  z-index: 30;
 }
 
 .top-bar .container {
@@ -147,10 +151,10 @@ header {
   padding: 1.5rem;
   background: var(--color-gray);
   color: var(--text-main);
-  border-radius: 1rem;
+  border-radius: var(--border-back);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: auto;
-  z-index: 1000; /* выше, чем у .top-bar (100) */
+  z-index: 40; /* выше, чем у .top-bar (100) */
 }
 
 .cart-item {
@@ -165,7 +169,7 @@ header {
   width: 6rem;
   height: 6rem;
   object-fit: cover;
-  border-radius: 0.8rem;
+  border-radius: var(--border-img-s);
 }
 
 /* Название и цена занимают поровну, поэтому блок количества стоит по центру */
@@ -245,6 +249,140 @@ header {
   transform: scale(1.2);
 }
 
+/* ===== Окно товара (FullItem) ===== */
+.full-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 50;
+}
+
+.full-item {
+  position: relative; /* для крестика */
+  width: 100%;
+  max-width: 90rem;
+  max-height: 90vh;
+  padding: 2rem;
+  background: var(--color-gray);
+  border-radius: var(--border-back);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.full-item img {
+  width: 50%;
+  height: 50rem;
+  object-fit: cover;
+  object-position: center;
+  border-radius: var(--border-img);
+}
+
+.full-item-inf {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.full-item h2 {
+  font-size: 2.4rem;
+  font-weight: 500;
+
+  color: var(--text-main);
+}
+
+.full-item p {
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+}
+
+.full-item b {
+  display: block;
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+
+/* Кнопка «Add to Cart» */
+.full-item .add-to-cart {
+  padding: 1rem;
+  background: var(--color-button);
+  color: var(--text-light);
+  text-align: center;
+  border-radius: var(--border-back);
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100%;
+}
+
+.full-item .add-to-cart:hover {
+  background: var(--color-button-hover);
+}
+
+/* Блок «− число +», когда товар уже в корзине */
+.full-item .in-cart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--color-button);
+  border-radius: var(--border-back);
+  transition: background 0.3s ease;
+  width: 100%;
+}
+
+.full-item .in-cart:hover {
+  background: var(--color-button-hover);
+}
+
+.full-item .quantity-control {
+  gap: 3rem;
+}
+
+.full-item .in-cart .cart-icon-quantity,
+.full-item .quantity {
+  color: var(--text-light);
+}
+
+.full-item .quantity {
+  min-width: 2rem;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  user-select: none;
+}
+
+/* Крестик закрытия (когда добавите его в JSX с этим классом) */
+.full-item-close {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+.full-item-close:hover {
+  transform: scale(1.1);
+  color: var(--color-disabled);
+}
+
 /* Главный баннер */
 .presentation {
   margin-top: 8rem; /* отступ под фиксированную шапку */
@@ -255,7 +393,7 @@ header {
   background-size: cover;
   background-blend-mode: multiply;
   background-color: var(--color-white);
-  border-radius: 2rem;
+  border-radius: var(--border-img);
   overflow: hidden;
 }
 
@@ -331,7 +469,7 @@ main {
 main .item {
   padding: 1.5rem;
   background: var(--color-gray);
-  border-radius: 1rem;
+  border-radius: var(--border-back);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -344,7 +482,7 @@ main .item img {
   object-position: center;
   display: block;
   margin-bottom: 1.5rem;
-  border-radius: 1.5rem;
+  border-radius: var(--border-img);
   transition: transform 0.3s ease;
 }
 
@@ -381,7 +519,7 @@ main .item .add-to-cart {
   background: var(--color-button);
   color: var(--text-light);
   text-align: center;
-  border-radius: 1rem;
+  border-radius: var(--border-back);
   cursor: pointer;
   transition: background 0.3s ease;
   margin-top: auto; /* прижимает кнопку к низу карточки */
@@ -398,7 +536,7 @@ main .item .in-cart {
   justify-content: center;
   padding: 1rem;
   background: var(--color-button);
-  border-radius: 1rem;
+  border-radius: var(--border-back);
   margin-top: auto;
   cursor: default;
   transition: background 0.3s ease;

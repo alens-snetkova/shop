@@ -1,6 +1,13 @@
 import Item from "./Item";
+import FullItem from "./FullItem";
 
-export default function Items({ items, orders, onAdd, updateQuantity }) {
+export default function Items({
+  items,
+  orders,
+  onAdd,
+  updateQuantity,
+  onOpen,
+}) {
   // { id: quantity } — чтобы не делать find() в каждой карточке
   const quantities = Object.fromEntries(orders.map((o) => [o.id, o.quantity]));
 
@@ -13,6 +20,7 @@ export default function Items({ items, orders, onAdd, updateQuantity }) {
           quantity={quantities[el.id]}
           onAdd={onAdd}
           updateQuantity={updateQuantity}
+          onOpen={onOpen}
         />
       ))}
     </main>

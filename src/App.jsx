@@ -3,11 +3,17 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Categories from "./components/Categories";
 import Items from "./components/Items";
+import FullItem from "./components/FullItem";
 import { ITEMS } from "./data/items";
 
 export default function App() {
   const [orders, setOrders] = useState([]);
   const [category, setCategory] = useState("all");
+  const [fullItem, setFullItem] = useState(null);
+
+  const openItem = (item) => setFullItem(item);
+
+  const closeItem = () => setFullItem(null);
 
   const addToOrder = (item) =>
     setOrders((prev) =>
@@ -30,7 +36,7 @@ export default function App() {
     setOrders((prev) => prev.filter((o) => o.id !== id));
 
   const chooseCategory = (key) => {
-    console.log("category:", key);
+    /*console.log("category:", key);*/
     setCategory(key);
   };
 
@@ -39,6 +45,7 @@ export default function App() {
       ? ITEMS
       : ITEMS.filter((item) => item.category === category);
 
+  console.log("fullItem:", fullItem);
   return (
     <div className="wrapper">
       <Header
@@ -53,7 +60,17 @@ export default function App() {
         orders={orders}
         onAdd={addToOrder}
         updateQuantity={updateQuantity}
+        onOpen={openItem}
       />
+      {fullItem && (
+        <FullItem
+          item={fullItem}
+          onClose={closeItem}
+          onAdd={addToOrder}
+          updateQuantity={updateQuantity}
+          quantity={orders.find((o) => o.id === fullItem.id)?.quantity}
+        />
+      )}
       <Footer />
     </div>
   );
