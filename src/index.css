@@ -1,34 +1,60 @@
 @import url("https://fonts.googleapis.com/css2?family=Jost:wght@100..900&display=swap");
 
-/* Шрифты и база*/
+/* ==========================================================================
+   СОДЕРЖАНИЕ
+   1. База: переменные, сброс, body, отступы при прокрутке к якорям
+   2. Контейнеры
+   3. Шапка (логотип, меню, иконка корзины)
+   4. Баннер
+   5. Корзина (выпадающее окно)
+   6. Блок «− число +» (общий)
+   7. Каталог (заголовок, категории, сетка, карточка товара)
+   8. Окно товара (FullItem)
+   9. Анимация полёта в корзину
+   10. Подвал
+   11. Бургер-меню
+   12. Адаптивы
+   ========================================================================== */
 
-/* 1rem = 10px для удобных расчётов */
+/* ==========================================================================
+   1. БАЗА
+   ========================================================================== */
+
+/* 1rem = 10px: так размеры в rem легко считать (3rem = 30px) */
 html {
   font-size: 62.5%;
   scroll-behavior: smooth;
 }
 
 :root {
-  /* Основные цвета */
-  --color-white: #fafafa;
+  /* Цвета интерфейса */
+  --color-white: #fafafa; /* фон страницы и шапки */
   --color-black: #222;
-  --color-gray: #ededed;
-  --color-button: #727272;
-  --color-button-hover: #303030;
-  --color-active: #027b4b;
-  --color-disabled: #be0000;
+  --color-gray: #ededed; /* фон карточек и корзины */
+  --color-button: #727272; /* кнопки */
+  --color-button-hover: #303030; /* кнопки при наведении */
+  --color-active: #027b4b; /* «включённое» состояние (открытая корзина) */
+  --color-disabled: #be0000; /* опасное действие (удаление) */
 
-  /* Текст */
+  /* Цвета текста */
   --text-main: #222;
-  --text-light: #fff;
-  --text-muted: #595959;
+  --text-light: #fff; /* текст на тёмном фоне */
+  --text-muted: #595959; /* второстепенный текст */
 
-  --border-back: 1rem;
-  --border-img: 1.5rem;
-  --border-img-s: 0.8rem;
+  /* Скругления */
+  --border-back: 1rem; /* карточки, кнопки, окна */
+  --border-img: 1.5rem; /* крупные картинки */
+  --border-img-s: 0.8rem; /* маленькие картинки (в корзине) */
+
+  /* Порядок слоёв: чем больше число, тем выше элемент на экране */
+  --z-header: 30; /* фиксированная шапка */
+  --z-cart: 40; /* окно корзины (над шапкой) */
+  --z-modal: 50; /* окно товара с затемнением */
+  --z-flying: 100; /* летящая картинка — над всем */
 }
 
-/* Глобальный сброс */
+/* Глобальный сброс: убираем стандартные отступы браузера
+   и включаем расчёт размеров вместе с padding и border */
 * {
   margin: 0;
   padding: 0;
@@ -40,29 +66,49 @@ body {
   color: var(--text-main);
   font-family: "Jost", sans-serif;
   font-weight: 300;
-  font-size: 1.6rem; /* 16px */
+  font-size: 1.6rem;
+  overflow-x: hidden; /* ← ДОБАВИТЬ: убирает горизонтальный скролл */
 }
 
-/* Контейнеры */
+/* Отступ при прокрутке к якорям ===== */
+#home {
+  scroll-margin-top: 8rem;
+}
+
+#catalog,
+#about,
+#contacts {
+  scroll-margin-top: 9rem;
+}
+
+/* ==========================================================================
+   2. КОНТЕЙНЕРЫ
+   ========================================================================== */
+
+/* Основная обёртка страницы: ограничивает ширину и центрирует контент */
 .wrapper {
   width: 100%;
   max-width: 128rem; /* 1280px */
   margin: 3rem auto;
+  padding: 2rem;
 }
 
+/* Внутренний контейнер с боковыми отступами (используется в шапке) */
 .container {
   max-width: 128rem;
   margin: 0 auto;
-  padding: 0 3rem;
   width: 100%;
 }
 
-/* Шапка: логотип, меню, иконка корзины */
+/* ==========================================================================
+   3. ШАПКА: логотип, меню, иконка корзины
+   ========================================================================== */
 header {
   display: flex;
   flex-direction: column;
 }
 
+/* Полоса шапки закреплена вверху окна и остаётся при прокрутке */
 .top-bar {
   width: 100%;
   position: fixed;
@@ -71,11 +117,12 @@ header {
   right: 0;
   background: var(--color-white);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 30;
+  z-index: var(--z-header);
 }
 
+/* Логотип слева, меню и корзина справа */
 .top-bar .container {
-  padding: 2rem 0;
+  padding: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -86,14 +133,18 @@ header {
   font-size: 2rem;
   letter-spacing: 0.1rem;
   color: var(--text-main);
+  text-decoration: none; /* убираем подчёркивание */
+  cursor: pointer;
 }
 
+/* Блок меню и корзины. position: relative нужен, чтобы окно корзины
+   (position: absolute) позиционировалось относительно этого блока */
 .nav-wrapper {
   display: flex;
   justify-content: flex-end;
   gap: 2rem;
   align-items: center;
-  position: relative; /* корзина позиционируется относительно этого блока */
+  position: relative;
 }
 
 .nav {
@@ -117,6 +168,7 @@ header {
   text-underline-offset: 0.4rem;
 }
 
+/* Иконка корзины в шапке. На неё же «прилетает» анимация (см. раздел 9) */
 .cart-icon {
   margin: 1rem 0 1rem 1rem;
   width: 2.2rem;
@@ -134,11 +186,59 @@ header {
   color: var(--text-main);
 }
 
+/* Зелёная иконка — корзина открыта */
 .cart-icon.active {
   color: var(--color-active);
 }
 
-/* Корзина (в шапке) */
+/* ==========================================================================
+   4. БАННЕР под шапкой
+   ========================================================================== */
+.presentation {
+  margin-top: 8rem; /* отступ, чтобы фиксированная шапка не перекрывала баннер */
+  width: 100%;
+  height: 70rem;
+  position: relative; /* для позиционирования подписей */
+  background: url("/img/bg.jpg") no-repeat center center;
+  background-size: cover;
+  background-blend-mode: multiply; /* затемняет фото цветом фона */
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: var(--border-img);
+  overflow: hidden;
+}
+
+/* Подписи на баннере создаются через псевдоэлементы, поэтому
+   в разметке (JSX) их нет. Первая строка — крупная и жирная */
+.presentation::before {
+  content: "Cozy stuff";
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%); /* точное центрирование по горизонтали */
+  font-size: 4rem;
+  font-weight: 600;
+  letter-spacing: 0.2rem;
+  color: var(--text-light);
+}
+
+/* Вторая строка — мельче и тоньше */
+.presentation::after {
+  content: "better for your home";
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.4rem;
+  font-weight: 300;
+  letter-spacing: 0.1rem;
+  color: var(--text-light);
+}
+
+/* ==========================================================================
+   5. КОРЗИНА (выпадающее окно в шапке)
+   ========================================================================== */
+
+/* Само окно: появляется под иконкой корзины, выровнено по правому краю */
 .cart {
   position: absolute;
   top: 100%;
@@ -147,16 +247,17 @@ header {
   width: 45rem;
   max-width: calc(100vw - 6rem); /* не вылезает за экран на узких устройствах */
   min-height: 10rem;
-  max-height: 50rem; /* длинный список прокручивается */
+  max-height: 50rem; /* длинный список прокручивается внутри окна */
   padding: 1.5rem;
   background: var(--color-gray);
   color: var(--text-main);
   border-radius: var(--border-back);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: auto;
-  z-index: 40; /* выше, чем у .top-bar (100) */
+  z-index: var(--z-cart);
 }
 
+/* Строка товара: фото | название | количество | сумма | удалить */
 .cart-item {
   display: flex;
   align-items: center;
@@ -168,14 +269,15 @@ header {
 .cart-item img {
   width: 6rem;
   height: 6rem;
-  object-fit: cover;
+  object-fit: cover; /* обрезает фото, не искажая пропорции */
   border-radius: var(--border-img-s);
 }
 
-/* Название и цена занимают поровну, поэтому блок количества стоит по центру */
+/* Название и сумма делят свободное место поровну (flex: 1),
+   поэтому блок «− число +» оказывается строго по центру */
 .cart-item-title {
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* разрешает длинному названию сжиматься */
   font-size: 1.6rem;
   font-weight: 400;
 }
@@ -187,6 +289,7 @@ header {
   font-weight: 600;
 }
 
+/* Число между «−» и «+» в корзине */
 .cart .item-price {
   min-width: 2rem;
   text-align: center;
@@ -194,13 +297,14 @@ header {
   font-weight: 500;
   color: var(--text-main);
   white-space: nowrap;
-  user-select: none;
+  user-select: none; /* чтобы число не выделялось при двойном клике */
 }
 
+/* Иконка удаления товара: серая, при наведении краснеет */
 .cart-icon-delete {
   width: 2.4rem;
   height: 2.4rem;
-  flex-shrink: 0;
+  flex-shrink: 0; /* не сжимается, когда не хватает места */
   cursor: pointer;
   color: var(--text-muted);
   transition:
@@ -213,6 +317,7 @@ header {
   transform: scale(1.2);
 }
 
+/* Итоговая сумма внизу корзины */
 .cart-total {
   margin-top: 1.5rem;
   text-align: right;
@@ -220,13 +325,18 @@ header {
   font-weight: 600;
 }
 
+/* Надпись «Cart is empty» */
 .cart-empty {
   text-align: center;
   color: var(--text-muted);
   padding: 5rem 0;
 }
 
-/* Общий блок - и + (корзина и карточка каталога) */
+/* ==========================================================================
+   6. БЛОК «− число +» (общий для корзины, каталога и окна товара)
+   Цвета иконок задаются отдельно в каждом контексте (раздел 7 и 8):
+   на светлом фоне иконки тёмные, на тёмно-сером — белые.
+   ========================================================================== */
 .quantity-control {
   display: flex;
   align-items: center;
@@ -239,7 +349,7 @@ header {
   flex-shrink: 0;
   display: inline-block;
   cursor: pointer;
-  color: var(--text-main); /* по умолчанию — светлый фон корзины */
+  color: var(--text-main); /* по умолчанию — для светлого фона корзины */
   transition:
     transform 0.3s ease,
     color 0.3s ease;
@@ -249,7 +359,165 @@ header {
   transform: scale(1.2);
 }
 
-/* ===== Окно товара (FullItem) ===== */
+/* ==========================================================================
+   7. КАТАЛОГ
+   ========================================================================== */
+
+/* --- Заголовок и категории --- */
+.section-title {
+  font-size: 3rem;
+  font-weight: 600;
+  letter-spacing: 0.1rem;
+  color: var(--text-main);
+  margin-top: 8rem;
+  margin-bottom: 2rem;
+}
+
+/* Строка категорий; на узких экранах переносится на новую строку */
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem 3rem; /* вертикальный и горизонтальный промежутки */
+  margin: 2rem 2rem 2rem 0;
+}
+
+.categories div {
+  font-size: 2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.categories div:hover,
+.categories div.active {
+  color: var(--text-main);
+}
+
+/* Выбранная категория: жирнее и подчёркнута */
+.categories div.active {
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 0.1rem;
+  text-underline-offset: 0.4rem;
+}
+
+/* --- Сетка карточек: три равные колонки --- */
+main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  width: 100%;
+}
+
+/* --- Карточка товара --- */
+main .item {
+  padding: 1.5rem;
+  background: var(--color-gray);
+  border-radius: var(--border-back);
+  overflow: hidden; /* скрывает часть фото, выходящую за границы при увеличении */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Фото одинаковой высоты у всех карточек */
+main .item img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  margin-bottom: 1.5rem;
+  border-radius: var(--border-img);
+  transition: transform 0.3s ease;
+}
+
+main .item img:hover {
+  transform: scale(1.05); /* лёгкое увеличение при наведении */
+}
+
+main .item h2 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  color: var(--text-main);
+}
+
+/* flex-grow: 1 растягивает описание и прижимает цену с кнопкой к низу,
+   поэтому кнопки во всех карточках на одном уровне */
+main .item p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+main .item b {
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+/* Кнопка «Add to Cart» */
+main .item .add-to-cart {
+  padding: 1rem;
+  background: var(--color-button);
+  color: var(--text-light);
+  text-align: center;
+  border-radius: var(--border-back);
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: auto; /* прижимает кнопку к низу карточки */
+}
+
+main .item .add-to-cart:hover {
+  background: var(--color-button-hover);
+}
+
+/* Блок «− число +», который заменяет кнопку, когда товар уже в корзине */
+main .item .in-cart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--color-button);
+  border-radius: var(--border-back);
+  margin-top: auto;
+  cursor: default;
+  transition: background 0.3s ease;
+}
+
+main .item .in-cart:hover {
+  background: var(--color-button-hover);
+}
+
+/* В карточке расстояние между «−», числом и «+» больше, чем в корзине */
+main .item .quantity-control {
+  gap: 3rem;
+}
+
+/* Фон блока тёмно-серый, поэтому иконки и число белые */
+main .item .in-cart .cart-icon-quantity {
+  color: var(--text-light);
+}
+
+main .item .quantity {
+  min-width: 2rem;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text-light);
+  user-select: none;
+}
+
+/* ==========================================================================
+   8. ОКНО ТОВАРА (FullItem)
+   ========================================================================== */
+
+/* Затемнённый фон на весь экран; карточка центрируется внутри.
+   position: fixed привязывает фон к окну браузера, inset: 0 растягивает его */
 .full-overlay {
   position: fixed;
   inset: 0;
@@ -258,19 +526,20 @@ header {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  z-index: 50;
+  z-index: var(--z-modal);
 }
 
+/* Сама карточка: фото слева, информация справа */
 .full-item {
-  position: relative; /* для крестика */
+  position: relative; /* нужен для позиционирования крестика */
   width: 100%;
   max-width: 90rem;
-  max-height: 90vh;
+  max-height: 90vh; /* не выше 90% высоты экрана */
   padding: 2rem;
   background: var(--color-gray);
   border-radius: var(--border-back);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  overflow: auto;
+  overflow: auto; /* если не помещается — прокрутка внутри карточки */
   display: flex;
   flex-direction: row;
   gap: 2rem;
@@ -284,6 +553,7 @@ header {
   border-radius: var(--border-img);
 }
 
+/* Правая часть: название, описание, цена, кнопка */
 .full-item-inf {
   display: flex;
   flex-direction: column;
@@ -295,10 +565,11 @@ header {
 .full-item h2 {
   font-size: 2.4rem;
   font-weight: 500;
-
   color: var(--text-main);
 }
 
+/* Отрицательный margin-top компенсирует gap, чтобы описание стояло
+   ближе к названию, чем остальные блоки */
 .full-item p {
   font-size: 1.6rem;
   line-height: 1.6;
@@ -351,6 +622,7 @@ header {
   gap: 3rem;
 }
 
+/* Тёмный фон блока: иконки и число белые */
 .full-item .in-cart .cart-icon-quantity,
 .full-item .quantity {
   color: var(--text-light);
@@ -364,7 +636,7 @@ header {
   user-select: none;
 }
 
-/* Крестик закрытия (когда добавите его в JSX с этим классом) */
+/* Крестик закрытия в правом верхнем углу карточки */
 .full-item-close {
   position: absolute;
   top: 2rem;
@@ -383,191 +655,300 @@ header {
   color: var(--color-disabled);
 }
 
-/* Главный баннер */
-.presentation {
-  margin-top: 8rem; /* отступ под фиксированную шапку */
-  width: 100%;
-  height: 70rem;
-  position: relative;
-  background: url("/img/bg.jpg") no-repeat center center;
-  background-size: cover;
-  background-blend-mode: multiply;
-  background-color: var(--color-white);
-  border-radius: var(--border-img);
-  overflow: hidden;
-}
-
-.presentation::before {
-  content: "Cozy stuff";
-  position: absolute;
-  bottom: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 4rem;
-  font-weight: 600;
-  letter-spacing: 0.2rem;
-  color: var(--text-light);
-}
-
-.presentation::after {
-  content: "better for your home";
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2.4rem;
-  font-weight: 300;
-  letter-spacing: 0.1rem;
-  color: var(--text-light);
-}
-
-/* Каталог: заголовок, категории */
-.section-title {
-  font-size: 3rem;
-  font-weight: 600;
-  letter-spacing: 0.1rem;
-  color: var(--text-main);
-  margin-top: 8rem;
-  margin-bottom: 2rem;
-}
-
-.categories {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem 3rem;
-  margin: 2rem 2rem 2rem 0;
-}
-
-.categories div {
-  font-size: 2rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.categories div:hover,
-.categories div.active {
-  color: var(--text-main);
-}
-
-/* Выбранная категория */
-.categories div.active {
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-thickness: 0.1rem;
-  text-underline-offset: 0.4rem;
-}
-
-/* Каталог: сетка и карточка товара */
-main {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3rem;
-  width: 100%;
-}
-
-main .item {
-  padding: 1.5rem;
-  background: var(--color-gray);
-  border-radius: var(--border-back);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-main .item img {
-  width: 100%;
-  height: 350px;
+/* ==========================================================================
+   9. АНИМАЦИЯ ПОЛЁТА В КОРЗИНУ
+   Картинку создаёт компонент FlyingImage. Он ставит её на место фото
+   товара и передаёт расстояния до корзины в переменных --dx и --dy.
+   ========================================================================== */
+.flying-image {
+  position: fixed; /* координаты считаются от окна браузера */
+  z-index: var(--z-flying);
   object-fit: cover;
-  object-position: center;
-  display: block;
-  margin-bottom: 1.5rem;
   border-radius: var(--border-img);
-  transition: transform 0.3s ease;
+  pointer-events: none; /* клики проходят сквозь летящую картинку */
+  /* forwards: после окончания остаётся в конечном состоянии */
+  animation: fly-to-cart 0.6s ease-in forwards;
 }
 
-main .item img:hover {
-  transform: scale(1.05);
+/* Описан только конечный кадр: начальным браузер считает текущий вид.
+   translate сдвигает картинку к корзине, scale уменьшает,
+   opacity делает полупрозрачной, border-radius превращает в круг.
+   Анимируются transform и opacity — их браузер рисует плавнее всего. */
+@keyframes fly-to-cart {
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+    opacity: 0.3;
+    border-radius: 50%;
+  }
 }
 
-main .item h2 {
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin: 0 0 1rem 0;
-  color: var(--text-main);
-}
-
-main .item p {
-  font-size: 1.2rem;
-  line-height: 1.6;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
-  flex-grow: 1; /* прижимает цену к низу */
-}
-
-main .item b {
-  font-size: 3rem;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 1.5rem;
-  display: block;
-}
-
-/* Кнопка «Add to Cart» */
-main .item .add-to-cart {
-  padding: 1rem;
-  background: var(--color-button);
-  color: var(--text-light);
-  text-align: center;
-  border-radius: var(--border-back);
-  cursor: pointer;
-  transition: background 0.3s ease;
-  margin-top: auto; /* прижимает кнопку к низу карточки */
-}
-
-main .item .add-to-cart:hover {
-  background: var(--color-button-hover);
-}
-
-/* Блок «− число +» вместо кнопки, когда товар уже в корзине */
-main .item .in-cart {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: var(--color-button);
-  border-radius: var(--border-back);
-  margin-top: auto;
-  cursor: default;
-  transition: background 0.3s ease;
-}
-
-main .item .in-cart:hover {
-  background: var(--color-button-hover);
-}
-
-main .item .quantity-control {
-  gap: 3rem;
-}
-
-/* Тёмно-серый фон карточки: белые иконки и текст */
-main .item .in-cart .cart-icon-quantity {
-  color: var(--text-light);
-}
-
-main .item .quantity {
-  min-width: 2rem;
-  text-align: center;
-  font-size: 1.6rem;
-  font-weight: 500;
-  color: var(--text-light);
-  user-select: none;
-}
-
-/* Подвал */
+/* ==========================================================================
+   10. ПОДВАЛ
+   ========================================================================== */
 footer {
   text-align: center;
   color: var(--text-muted);
   padding: 10rem 0;
   font-size: 1.4rem;
+}
+
+/* ============================================
+   11. БУРГЕР-МЕНЮ (МОБИЛЬНАЯ НАВИГАЦИЯ)
+   ============================================ */
+.burger-menu {
+  display: none; /* Скрыто на десктопе, включается в @media */
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-radius: 50%; /* Делаем область клика круглой */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* При наведении или когда меню открыто (.active) */
+.burger-menu:hover,
+.burger-menu.active {
+  background-color: var(--color-gray);
+  color: var(--text-main);
+}
+
+/* Выпадающее мобильное меню */
+.mobile-nav {
+  display: none; /* Скрыто по умолчанию */
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 1rem;
+  width: 20rem;
+  background: var(--color-white);
+  border-radius: var(--border-back);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  z-index: 35; /* Выше шапки (30), но ниже корзины (40) */
+}
+
+/* Класс .open добавляется через React при клике на бургер */
+.mobile-nav.open {
+  display: block;
+}
+
+.mobile-nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-end; /* Выравнивание ссылок по правому краю */
+}
+
+.mobile-nav ul li a {
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 1.6rem;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.mobile-nav ul li a:hover {
+  color: var(--color-active);
+}
+
+/* ============================================
+   12. АДАПТИВНАЯ ВЁРСТКА (MEDIA QUERIES)
+   Изменяем сетку, отступы и размеры элементов
+   для планшетов и мобильных устройств.
+   ============================================ */
+
+/* ===== ПЛАНШЕТ (до 1024px) ===== */
+@media (max-width: 1024px) {
+  .wrapper {
+    padding: 0 2rem; /* Уменьшаем боковые отступы основной обёртки */
+  }
+
+  .top-bar .container {
+    padding: 1rem 2rem; /* Делаем шапку чуть компактнее */
+  }
+
+  .cart-icon {
+    width: 2.4rem; /* Чуть крупнее иконка для удобства нажатия */
+    height: 2.4rem;
+  }
+
+  /* Каталог: перестраиваем сетку в 2 колонки вместо 3 */
+  main {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  main .item img {
+    height: 280px; /* Уменьшаем высоту фото в карточке */
+  }
+
+  /* Баннер: уменьшаем высоту и размер текста */
+  .presentation {
+    height: 50rem;
+    margin-top: 6rem;
+  }
+
+  .presentation::before {
+    font-size: 3rem;
+  }
+  .presentation::after {
+    font-size: 2rem;
+  }
+
+  /* Скрываем десктопное меню, показываем иконку бургера */
+  .nav {
+    display: none;
+  }
+  .burger-menu {
+    display: flex;
+  }
+}
+
+/* ===== МОБИЛЬНЫЙ (до 768px) ===== */
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 0 1rem; /* Ещё уже боковые отступы */
+  }
+
+  .top-bar .container {
+    padding: 1rem;
+  }
+
+  .logo {
+    font-size: 1.8rem;
+  }
+
+  /* Баннер: компактный размер для телефона */
+  .presentation {
+    height: 35rem;
+  }
+
+  .presentation::before {
+    font-size: 2.5rem;
+    bottom: 4rem;
+  }
+
+  .presentation::after {
+    font-size: 1.6rem;
+    bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 2.4rem;
+    margin-top: 4rem;
+  }
+
+  .categories {
+    gap: 1.5rem 2rem;
+    margin: 1rem 0;
+  }
+
+  .categories div {
+    font-size: 1.6rem;
+  }
+
+  /* Модалка товара: фото сверху, текст снизу (вертикальная колонка) */
+  .full-item {
+    flex-direction: column;
+    max-height: 95vh;
+    padding: 1.5rem;
+  }
+
+  .full-item img {
+    width: 100%;
+    height: 30rem;
+  }
+
+  .full-item-inf {
+    gap: 1.5rem;
+  }
+  .full-item h2 {
+    font-size: 2rem;
+  }
+  .full-item b {
+    font-size: 2.4rem;
+  }
+
+  .full-item-close {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  /* Корзина: подстраиваем ширину под экран телефона */
+  .cart {
+    width: calc(100vw - 2rem);
+    max-width: calc(100vw - 2rem);
+    right: -1rem;
+  }
+}
+
+/* ===== МАЛЕНЬКИЙ МОБИЛЬНЫЙ (до 480px) ===== */
+@media (max-width: 480px) {
+  .wrapper {
+    padding: 0 1rem;
+  }
+
+  .top-bar .container {
+    padding: 0.8rem 1rem;
+  }
+
+  /* Каталог: одна колонка на всю ширину */
+  main {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  main .item img {
+    height: 250px;
+  }
+  main .item p {
+    font-size: 1.3rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    margin-top: 3rem;
+  }
+
+  .categories {
+    justify-content: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Баннер: минимальная высота */
+  .presentation {
+    height: 25rem;
+  }
+  .presentation::before {
+    font-size: 2rem;
+    bottom: 3rem;
+  }
+  .presentation::after {
+    font-size: 1.2rem;
+    bottom: 1rem;
+  }
+
+  /* Корзина: почти на весь экран для удобства */
+  .cart {
+    width: 95vw;
+    max-width: 95vw;
+    right: -0.5rem;
+    border-radius: var(--border-back);
+    max-height: 70vh;
+  }
+
+  .cart-item img {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  footer {
+    padding: 5rem 0;
+    font-size: 1.2rem;
+  }
 }

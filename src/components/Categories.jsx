@@ -1,3 +1,12 @@
+/**
+ * Categories — строка с категориями для фильтрации каталога.
+ *
+ * Props:
+ *  - activeCategory — ключ выбранной сейчас категории
+ *  - onChoose       — вызывается с ключом категории при клике
+ */
+
+// key должен совпадать с полем category у товаров (data/items.js)
 const CATEGORIES = [
   { key: "all", name: "All" },
   { key: "chairs", name: "Chairs" },
@@ -13,6 +22,7 @@ export default function Categories({ activeCategory, onChoose }) {
       {CATEGORIES.map((el) => (
         <div
           key={el.key}
+          // Выбранной категории добавляется класс active
           className={el.key === activeCategory ? "active" : ""}
           onClick={() => onChoose(el.key)}
         >
