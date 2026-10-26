@@ -7,10 +7,11 @@
  *  - updateQuantity  — изменить количество: (id, delta)
  *  - removeFromOrder — удалить товар из корзины: (id)
  */
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { IoCartOutline, IoMenu, IoClose } from "react-icons/io5";
 import { MdDeleteForever } from "react-icons/md";
 import QuantityControl from "./QuantityControl";
+import useClickOutside from "../hooks/useClickOutside";
 
 // Пункты меню;
 export const NAV_LINKS = [
@@ -27,7 +28,15 @@ export default function Header({
 }) {
   // Открыто ли окно корзины (локальное состояние: нужно только шапке)
   const [cartOpen, setCartOpen] = useState(false);
+
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const cartRef = useRef(null);
+  const menuRef = useRef(null);
+  const burgerRef = useRef(null);
+
+  useClickOutside(cartRef, () => setCartOpen(false), cartOpen);
+  useClickOutside([menuRef, burgerRef], () => setMenuOpen(false), menuOpen);
 
   // Общая сумма: цена × количество по каждому товару, строкой с 2 знаками
   const total = orders
@@ -55,25 +64,70 @@ export default function Header({
             {/* Иконка корзины: клик открывает и закрывает окно.
                 Класс "cart-icon" используется и в анимации полёта
                 (App ищет иконку по этому классу). */}
-            <IoCartOutline
-              onClick={() => setCartOpen((open) => !open)}
-              className={`cart-icon ${cartOpen ? "active" : ""}`}
-            />
-            {/* Бургер / крестик (виден только на планшете/мобилке) */}
-            {menuOpen ? (
-              <IoClose
-                className={`burger-menu ${menuOpen ? "active" : ""}`}
-                onClick={() => setMenuOpen(false)}
+            <div className="cart-wrapper" ref={cartRef}>
+              <IoCartOutline
+                onClick={() => setCartOpen((open) => !open)}
+                className={`cart-icon ${cartOpen ? "active" : ""}`}
               />
-            ) : (
-              <IoMenu
-                className="burger-menu"
-                onClick={() => setMenuOpen(true)}
-              />
-            )}
+              {/* Окно корзины */}
+              {cartOpen && (
+                <div className="cart">
+                  {orders.length > 0 ? (
+                    <>
+                      {orders.map((el) => (
+                        <div className="cart-item" key={el.id}>
+                          <img src={el.img} alt={el.title} />
+                          <span className="cart-item-title">{el.title}</span>
+
+                          <QuantityControl
+                            quantity={el.quantity}
+                            onChange={(delta) => updateQuantity(el.id, delta)}
+                            quantityClassName="item-price"
+                          />
+
+                          {/* Стоимость позиции с учётом количества */}
+                          <b className="item-total">
+                            {(el.price * el.quantity).toFixed(2)} $
+                          </b>
+
+                          <MdDeleteForever
+                            className="cart-icon-delete"
+                            title="Remove"
+                            onClick={() => removeFromOrder(el.id)}
+                          />
+                        </div>
+                      ))}
+
+                      <p className="cart-total">Total: {total} $</p>
+                    </>
+                  ) : (
+                    <p className="cart-empty">Cart is empty</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Кнопка бургер / крестик */}
+            <div className="burger-wrapper" ref={burgerRef}>
+              {menuOpen ? (
+                <IoClose
+                  className="burger-menu active"
+                  onClick={() => setMenuOpen(false)}
+                />
+              ) : (
+                <IoMenu
+                  className="burger-menu"
+                  onClick={() => setMenuOpen(true)}
+                />
+              )}
+            </div>
 
             {/* Выпадающее мобильное меню */}
-            <div className={`mobile-nav ${menuOpen ? "open" : ""}`}>
+
+            <div
+              className={`mobile-nav ${menuOpen ? "open" : ""}`}
+              ref={menuRef}
+            >
               <ul>
                 {NAV_LINKS.map((link) => (
                   <li key={link.label}>
@@ -87,42 +141,6 @@ export default function Header({
                 ))}
               </ul>
             </div>
-            {/* Окно корзины */}
-            {cartOpen && (
-              <div className="cart">
-                {orders.length > 0 ? (
-                  <>
-                    {orders.map((el) => (
-                      <div className="cart-item" key={el.id}>
-                        <img src={el.img} alt={el.title} />
-                        <span className="cart-item-title">{el.title}</span>
-
-                        <QuantityControl
-                          quantity={el.quantity}
-                          onChange={(delta) => updateQuantity(el.id, delta)}
-                          quantityClassName="item-price"
-                        />
-
-                        {/* Стоимость позиции с учётом количества */}
-                        <b className="item-total">
-                          {(el.price * el.quantity).toFixed(2)} $
-                        </b>
-
-                        <MdDeleteForever
-                          className="cart-icon-delete"
-                          title="Remove"
-                          onClick={() => removeFromOrder(el.id)}
-                        />
-                      </div>
-                    ))}
-
-                    <p className="cart-total">Total: {total} $</p>
-                  </>
-                ) : (
-                  <p className="cart-empty">Cart is empty</p>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </div>
