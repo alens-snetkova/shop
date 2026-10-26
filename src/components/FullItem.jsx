@@ -31,7 +31,13 @@ export default function FullItem({
 
   return (
     // Тёмный фон на весь экран
-    <div className="full-overlay">
+    <div
+      className="full-overlay"
+      onClick={(e) => {
+        // закрываем, только если кликнули именно по затемнению, а не по карточке
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       {/* Сама карточка */}
       <div className="full-item">
         <IoClose className="full-item-close" onClick={onClose} />

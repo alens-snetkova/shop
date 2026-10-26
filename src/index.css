@@ -527,6 +527,7 @@ main .item .quantity {
   justify-content: center;
   padding: 2rem;
   z-index: var(--z-modal);
+  cursor: pointer; /* на iOS помогает событию click срабатывать на оверлее */
 }
 
 /* Сама карточка: фото слева, информация справа */
@@ -543,6 +544,7 @@ main .item .quantity {
   display: flex;
   flex-direction: row;
   gap: 2rem;
+  cursor: default; /* внутри карточки курсор обычный */
 }
 
 .full-item img {
@@ -798,6 +800,10 @@ footer {
   }
   .presentation::after {
     font-size: 2rem;
+  }
+
+  .full-item-close {
+    display: none;
   }
 
   /* Скрываем десктопное меню, показываем иконку бургера */
